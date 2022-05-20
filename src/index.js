@@ -10,7 +10,7 @@ import "./styles.css";
 //   var result = arr[0];
 //   var k = 1;
 //   while (k < len) {
-//     result = callback(result, arr[k], arr);
+//     result = callback(result, arr[k], k, arr);
 //     k++;
 //   }
 //   return result;
@@ -110,7 +110,7 @@ import "./styles.css";
 //   }
 //   obj.fn = this;
 //   return function () {
-//     obj.fn(...args);
+//     return obj.fn(...args);
 //   };
 // };
 
@@ -122,19 +122,56 @@ import "./styles.css";
 
 //Object.create
 
-Object.prototype.myCreate = function (proto) {
+Object.prototype.myCreate = function (proto, props) {
   function F() {}
   F.prototype = proto;
-  // if (typeof props === "object") {
-  //   for (var item in props) {
-  //     if (props.hasOwnProperty(item)) {
-  //       F[item] = props[item];
-  //     }
-  //   }
-  // }
+  if (typeof props === "object") {
+    for (var item in props) {
+      if (props.hasOwnProperty(item)) {
+        F[item] = props[item];
+      }
+    }
+  }
   return new F();
 };
 
 var abc = Object.myCreate({ a: 123 });
 abc.b = 2;
 console.log("abc", abc);
+
+
+var ReduxContext  = React.createContext('redux')
+const connect =  (mapStateToProps, mapDispatchToProps) => WrappedComponent => {
+ class Connect extands React.Component {
+ constructor(props) {
+   super(props);
+   this.state = props.store.getState();
+ }
+
+ componentDidMount() {
+   this.props.store.subscribe((state) => {
+     this.setState(state)
+   }
+ }
+
+render() {
+  const { store } = this.props;
+  return (<WrappedComponent 
+    {...this.props} 
+    {...mapStateToProps(store.getState())} 
+    {...mapDispatchToProps(store.dispatch)}  
+    />)
+}
+ }
+
+ return (props) =>  (
+   <ReduxContext.Consumer>
+     {store => <Connect {...props} store={store}></Connect>}
+     </ReduxContext.Consumer>
+ )
+
+
+ }
+  
+
+}
