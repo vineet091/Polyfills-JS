@@ -140,6 +140,32 @@ abc.b = 2;
 console.log("abc", abc);
 
 
+// var subscriber = [];
+// function subscribe(eventName, callback, id) {
+//   if (!subscriber[eventName]) {
+//     subscriber[eventName] = [];
+//   }
+//   subscriber[eventName].push({ id, callback });
+// }
+
+// function unsubscribe(eventName, id) {
+//   if (subscriber[eventName]) {
+//     subscriber[eventName] = subscriber[eventName].filter((evtObj) => {
+//       return evtObj.id !== id;
+//     });
+//   }
+// }
+
+
+// function publishData(eventName, data) {
+//   if (subscriber[eventName]) {
+//     var publishTo = subscriber[eventName] || [];
+//     publishTo.map((callbackObj) => {
+//       callbackObj.callback(data);
+//     });
+//   }
+// }
+
 var ReduxContext  = React.createContext('redux')
 const connect =  (mapStateToProps, mapDispatchToProps) => WrappedComponent => {
  class Connect extands React.Component {
