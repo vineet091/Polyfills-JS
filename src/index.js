@@ -1,20 +1,21 @@
 import "./styles.css";
 
 //Reduce
-// Array.prototype.myReduce = function (callback) {
-//   if (typeof callback !== "function") {
+
+// Array.prototype.myReduce= function(callbackFn, initialValue) {
+//     if (typeof callback !== "function") {
 //     throw new Error("error");
 //   }
-//   var arr = this;
-//   var len = arr.length;
-//   var result = arr[0];
-//   var k = 1;
-//   while (k < len) {
-//     result = callback(result, arr[k], k, arr);
-//     k++;
+//   var accumulator = initialValue;
+// for (var i = 0; i < this.length; i++) {
+//     if (accumulator !== undefined) {
+//       accumulator = callbackFn.call(undefined, accumulator, this[i], i, this);
+//     } else {
+//       accumulator = this[i];
+//     }
 //   }
-//   return result;
-// };
+//   return accumulator;
+// }
 
 // var prod = [1, 2, 3].myReduce((prod, value) => {
 //   return prod * value;
@@ -22,25 +23,21 @@ import "./styles.css";
 // console.log(prod);
 
 // Filter
-
-// Array.prototype.myFilter = function (callback) {
-//   if (typeof callback !== "function") {
+// Array.prototype.myFilter = function(callbackFn) {
+//     if (typeof callbackFn !== "function") {
 //     throw new Error("Callback not defined");
 //   }
 //   if (this === null) {
 //     throw new Error("Array not defined");
 //   }
-//   var k = 0;
-//   var arr = this;
-//   var res = [];
-//   while (k < arr.length) {
-//     if (callback(arr[k], k, arr)) {
-//       res.push(arr[k]);
+//   var arr = [];     
+//   for (var i = 0; i < this.length; i++) {
+//     if (callbackFn.call(this, this[i], i, this)) {
+//       arr.push(this[i]);
 //     }
-//     k++;
 //   }
-//   return res;
-// };
+//   return arr;
+// }
 
 // var prod = [1, 2, 3].myFilter((value) => {
 //   return value !== 2;
@@ -48,25 +45,21 @@ import "./styles.css";
 // console.log(prod);
 
 // Map
-// Array.prototype.myMap = function (callback) {
-//   if (typeof callback !== "function") {
+// Array.prototype.myMap = function(callbackFn) {
+  //   if (typeof callbackFn !== "function") {
 //     throw new Error("Callback not defined");
 //   }
 //   if (this === null) {
 //     throw new Error("Array not defined");
 //   }
-//   var k = 0;
-//   var arr = this;
-//   var res = [];
-//   var mappedValue;
-//   while (k < arr.length) {
-//     mappedValue = callback(arr[k], k, arr);
-//     res.push(mappedValue);
-//     k++;
+//   var arr = [];              
+//   for (var i = 0; i < this.length; i++) { 
+//      /* call the callback function for every value of this array and       push the returned value into our resulting array
+//      */
+//     arr.push(callbackFn(this[i], i, this));
 //   }
-//   return res;
-// };
-
+//   return arr;
+// }
 // var prod = [1, 2, 3].myMap((value) => {
 //   return value * 2;
 // });
@@ -122,22 +115,22 @@ import "./styles.css";
 
 //Object.create
 
-Object.prototype.myCreate = function (proto, props) {
-  function F() {}
-  F.prototype = proto;
-  if (typeof props === "object") {
-    for (var item in props) {
-      if (props.hasOwnProperty(item)) {
-        F[item] = props[item];
-      }
-    }
-  }
-  return new F();
-};
+// Object.prototype.myCreate = function (proto, props) {
+//   function F() {}
+//   F.prototype = proto;
+//   if (typeof props === "object") {
+//     for (var item in props) {
+//       if (props.hasOwnProperty(item)) {
+//         F[item] = props[item];
+//       }
+//     }
+//   }
+//   return new F();
+// };
 
-var abc = Object.myCreate({ a: 123 });
-abc.b = 2;
-console.log("abc", abc);
+// var abc = Object.myCreate({ a: 123 });
+// abc.b = 2;
+// console.log("abc", abc);
 
 
 // var subscriber = [];
@@ -166,29 +159,29 @@ console.log("abc", abc);
 //   }
 // }
 
-var ReduxContext  = React.createContext('redux')
-const connect =  (mapStateToProps, mapDispatchToProps) => WrappedComponent => {
- class Connect extands React.Component {
- constructor(props) {
-   super(props);
-   this.state = props.store.getState();
- }
-
- componentDidMount() {
-   this.props.store.subscribe((state) => {
-     this.setState(state)
-   }
- }
-
-render() {
-  const { store } = this.props;
-  return (<WrappedComponent 
-    {...this.props} 
-    {...mapStateToProps(store.getState())} 
-    {...mapDispatchToProps(store.dispatch)}  
-    />)
+var ReduxContext  = React.createContext('redux');
+class Connect extands React.Component {
+  constructor(props) {
+    super(props);
+    this.state = props.store.getState();
+  }
+ 
+  componentDidMount() {
+    this.props.store.subscribe((state) => {
+      this.setState(state)
+    })
+  }
+  
+  render() {
+    const { store } = this.props;
+    return (<WrappedComponent 
+      {...this.props} 
+      {...mapStateToProps(store.getState())} 
+      {...mapDispatchToProps(store.dispatch)}  
+      />)
+  }
 }
- }
+const connect =  (mapStateToProps, mapDispatchToProps) => WrappedComponent => {
 
  return (props) =>  (
    <ReduxContext.Consumer>
@@ -199,5 +192,3 @@ render() {
 
  }
   
-
-}
