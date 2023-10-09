@@ -159,6 +159,58 @@ import "./styles.css";
 //   }
 // }
 
+//Settimeout
+
+var timers = {}
+window.mySetTimeout = function(callback, delay) {
+  if (typeof(callback) != 'function') throw new Error("callback should be a function");
+  if (typeof(delay) != 'number' || delay < 0) throw new Error("delay should be a positive number");
+  var startTime = Date.now();
+  // generate a new id
+  var newId = generateNewId();
+  
+  // add it to the list of timers
+  timers[newId] = {
+    callback: callback,
+    time:  startTime + delay // add the time after which callback needs to be executed
+  };
+  function check() {
+    if (Date.now() >= startTime + delay) callback();
+    else requestIdleCallback(check);
+  }
+  requestIdleCallback(check);
+  // return the id to the consumer for referencing it for later use.
+  return newId;
+}
+
+// cancels the callback execution for an id.
+window.myClearTimeout = function(id) {
+  if (timers.hasOwnProperty(id)) delete timers[id]; // if id exists just delete the timer and in the next check this timer won't be there
+}
+
+// Set Interval
+function setIntervalPolyfill(callbackFn, delay = 0, ...args) {
+  if (typeof callbackFn !== "function") {
+    throw new TypeError("'callback' should be a function");
+  }
+
+  // Unique
+  var id = intervalID++;
+
+  function repeat() {
+    intervalMap[id] = setTimeout(() => {
+      callbackFn(...args);
+      // Terminating
+      if (intervalMap[id]) {
+        repeat();
+      }
+    }, delay);
+  }
+  repeat();
+
+  return id;
+}
+
 var ReduxContext  = React.createContext('redux');
 class Connect extands React.Component {
   constructor(props) {
