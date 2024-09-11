@@ -159,6 +159,35 @@ import "./styles.css";
 //   }
 // }
 
+//Throttle
+
+function throttle(func, delay) {
+  var inthrottle
+  return function(...args) {
+    if(!inthrottle) {
+      inthrottle = true;
+      func.call(this, ...args);
+      setTimeout(() => {
+        inthrottle =false;
+       }, delay)}
+  }
+}
+
+//Debounce
+
+function debounce(func, delay) {
+  var interval
+  return function(...args) {
+    if(interval) {
+      clearTimeout(interval);
+    }
+    interval = setTimeout(() => {
+      func.call(this, ...args);
+    }, delay)
+  }
+}
+
+
 //Settimeout
 
 var timers = {}
