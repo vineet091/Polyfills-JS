@@ -240,30 +240,79 @@ function setIntervalPolyfill(callbackFn, delay = 0, ...args) {
   return id;
 }
 
-var ReduxContext  = React.createContext('redux');
-class Connect extands React.Component {
-  constructor(props) {
-    super(props);
-    this.state = props.store.getState();
-  }
- 
-  componentDidMount() {
-    this.props.store.subscribe((state) => {
-      this.setState(state)
-    })
-  }
-  
-  render() {
-    const { store } = this.props;
-    return (<WrappedComponent 
-      {...this.props} 
-      {...mapStateToProps(store.getState())} 
-      {...mapDispatchToProps(store.dispatch)}  
-      />)
-  }
-}
-const connect =  (mapStateToProps, mapDispatchToProps) => WrappedComponent => {
+// const store = redux.createStore(reducer);
+// store.getCurrentState();
+//
 
+// my redux
+const Redux = {
+  currentStateInfo: "",
+  createStore: (rFn) => {
+    Redux.currentStateInfo = rFn();
+    return {
+      getState: () => {
+        return Redux.currentStateInfo;
+      },
+      dispatch: (obj) => {
+        Redux.currentStateInfo = rFn(Redux.currentStateInfo, obj);
+      },
+    };
+  },
+};
+
+const defaultState = { login: false, name: "" };
+
+const reducer = (state = defaultState, action = { type: "" }) => {
+  console.log("Reducer called : ", action);
+  switch (action.type) {
+    case "LOGIN":
+      return { login: true, name: action.name };
+    case "LOGOUT":
+      return { login: false, name: action.name };
+    default:
+      return state;
+  }
+};
+
+const store = Redux.createStore(reducer);
+console.log("store : ", store);
+
+const currentState = store.getState();
+console.log("currentState 1 : ", currentState);
+
+const loginAction = () => {
+  return {
+    type: "LOGIN",
+    name: 'abc'
+  };
+};
+
+store.dispatch(loginAction());
+
+var ReduxContext  = React.createContext('redux');
+
+const connect =  (mapStateToProps, mapDispatchToProps) => WrappedComponent => {
+  class Connect extands React.Component {
+    constructor(props) {
+      super(props);
+      this.state = props.store.getState();
+    }
+   
+    componentDidMount() {
+      this.props.store.subscribe((state) => {
+        this.setState(state)
+      })
+    }
+    
+    render() {
+      const { store } = this.props;
+      return (<WrappedComponent 
+        {...this.props} 
+        {...mapStateToProps(store.getState())} 
+        {...mapDispatchToProps(store.dispatch)}  
+        />)
+    }
+  }
  return (props) =>  (
    <ReduxContext.Consumer>
      {store => <Connect {...props} store={store}></Connect>}
